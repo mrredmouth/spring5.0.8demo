@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+ 
+ 	<!-- 配置AOP：
+ 			属性proxy-target-class默认为false，切点只对接口有效；设置为true时，可以对类对象有效。
+ 			一个aop:config可以配置多个 aop:aspect -->
+    <aop:config proxy-target-class="false">
+    	<aop:aspect id="myaspect" ref="matchmakingAspect">
+    		<!-- 设置切点表达式pointcut，表示在哪些类和方法插入切面 -->
+    		<aop:pointcut expression="execution(* com.ccg.spring.aop.matchmaking.impl.*.*(..))" id="matchmakingPointCut"/>
+    		<!-- 配置切面通知，引用matchmakingAspect切面 -->
+    		<aop:before method="before" pointcut-ref="matchmakingPointCut"/>
+    		<aop:around method="around" pointcut-ref="matchmakingPointCut"/>
+    		<aop:after method="after" pointcut-ref="matchmakingPointCut"/>
+    		<aop:after-throwing method="afterThrowing" throwing="th" pointcut-ref="matchmakingPointCut"/>
+    		<aop:after-returning method="afterReturning" returning="result" pointcut-ref="matchmakingPointCut"/>
+    	</aop:aspect>
+    </aop:config>
+    <!-- 配置切面bean -->
+	<bean id="matchmakingAspect" class="com.ccg.spring.aop.matchmaking.MatchmakingAspect"></bean>
+	<!-- 配置被切入的bean -->
+	<bean id="boyMatchmaking" p:name="刘洋表哥" class="com.ccg.spring.aop.matchmaking.impl.BoyMatchmaking"></bean>
+ 
+ 	<!-- 注解方式定义AOP：扫描包要包括切面类，也实例化成了bean -->
+ 	<context:component-scan base-package="com.ccg.spring.aop.mathculculator"></context:component-scan>
+ 	<!-- 是AspjectJ注解起作用：自动匹配注解的类生成代理对象 -->
+ 	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+ 	
+</beans>

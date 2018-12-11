@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+ 
+ 	<!-- ====================装配方式九：扫描注解组件的方式创建bean，注解标志在类上面。============= -->
+ 	
+  	<!-- 	四种特定的组件：@Component 基本注解，表示成为受spring管理的组件
+						   @Respository 持久层组件
+						   @Service 业务层（服务层）组件
+						   @Controller 表现层组件 
+			扫描到的bean：默认bean名为类限定名，首字母小写。也可以在注解的value属性命名。-->
+	<!-- component-scan扫面此包以及子包中含注释的组件 -->
+	<context:component-scan base-package="com.ccg.spring.bean.annotation"></context:component-scan>
+	
+	<!-- resource-pattern:"repository/*.class" 只扫描子包repository下面的类 -->
+<!-- 	<context:component-scan base-package="com.ccg.spring.bean.annotation" resource-pattern="repository/*.class"></context:component-scan>
+ -->	
+	<!-- exclude-filter：不包含指定表达式的组件。
+		type="annotation": 过滤的类型是注解。org.springframework.stereotype.Repository表示@Repository的组件。
+		一个context可以有多个exclude-filter和include-filter -->
+	<!-- <context:component-scan base-package="com.ccg.spring.bean.annotation">
+		<context:exclude-filter type="annotation" expression="com.ccg.spring.bean.annotation.service.UserService"/>
+	</context:component-scan> -->
+	
+	<!-- include-filter：包含指定表达式的组件。type="annotation"。
+		  包含必须与use-default-filters属性联合使用：设置为false，不使用默认的filters。默认值为true，会扫描出所有的 -->
+	<!-- <context:component-scan base-package="com.ccg.spring.bean.annotation" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+	</context:component-scan> -->
+	
+	<!-- include-filter：包含指定表达式的组件。
+		 type="assignable":过滤的类型是类名（某接口以及此接口实现类）。
+		  包含必须与use-default-filters属性联合使用：设置为false，不使用默认的filters。默认值为true，会扫描出所有的 -->
+	<!-- <context:component-scan base-package="com.ccg.spring.bean.annotation" use-default-filters="true">
+		<context:exclude-filter type="assignable" expression="com.ccg.spring.bean.annotation.repository.UserRepository"/>
+	</context:component-scan> -->
+	<!-- 包含指定表达式的组件，过滤的类型是类名，某个接口以及此接口的实现类。
+			同样要与use-default-filters属性联合使用，设置为false -->
+	<!-- <context:component-scan base-package="com.ccg.spring.bean.annotation" use-default-filters="false">
+		<context:include-filter type="assignable" expression="com.ccg.spring.bean.annotation.repository.UserRepository"/>
+	</context:component-scan> -->
+ 	
+</beans>

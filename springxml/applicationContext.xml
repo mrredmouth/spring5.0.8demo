@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+    
+    <!-- 用context命名空间，导入外部的properties文件。可以用${}调用properties文件中的属性 -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>  
+       
+    <!-- DBCP连接池:org.apache.commons.dbcp2.BasicDataSource
+    	 Druid连接池:com.alibaba.druid.pool.DruidDataSource -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+    	<property name="driverClassName" value="${oracle.driverClassName}" />
+		<property name="url" value="${oracle.url}" />
+		<property name="username" value="${oracle.username}" />
+		<property name="password" value="${oracle.password}" />
+		<!-- 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除。
+		每30秒(timeBetweenEvictionRunsMillis)，取出3条连接(numTestsPerEvictionRun)，
+		使用"SELECT 1 FROM DUAL"SQL进行测试 (validationQuery)，测试不成功就销毁连接。
+		销毁连接后，连接数量就少了，如果小于minIdle数量，就新建连接。 -->
+		<property name="testWhileIdle" value="true" />
+		<!-- 验证连接是否可用，使用的SQL语句 -->
+		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
+		<!-- 借出连接时不要测试，否则很影响性能，默认值是true。
+			若配置为true,对性能有非常大的影响，性能会下降7-10倍。 -->
+		<property name="testOnBorrow" value="false" />
+		<!-- 每30秒运行一次空闲连接回收器 -->
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />
+		<!-- 在每次空闲连接回收器线程(如果有)运行时检查的连接数量，默认值就是3 -->
+		<property name="numTestsPerEvictionRun" value="3" />
+		<!-- 池中的连接空闲30分钟后被回收,默认值就是30分钟 -->
+		<property name="minEvictableIdleTimeMillis" value="1800000" />
+    </bean>
+    <!-- 配置spring的jdbc模板类：JdbcTemplate -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    	<property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- 配置另一个jdbc模板类：NamedParameterJdbcTemplate，可带具名参数。与上面的两者其一即可 -->
+    <bean id="namedParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+    	<constructor-arg ref="dataSource"></constructor-arg>
+    </bean>
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- 启动事务注解，使得事务的注解可用 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    
+    <!-- ==========================xml方式配置事务===================================== -->
+    <!-- 1、配置事务属性 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    	<tx:attributes>
+    		<!-- 为哪些方法指定事务,可以使用通配符* -->
+    		<tx:method name="transferAccount" propagation="REQUIRED"/>
+    		<tx:method name="get*"/>
+    		<tx:method name="find*"/>
+    	</tx:attributes>
+    </tx:advice>
+    <!-- 2、配置事务的切入点,在切入点切入事务的配置 -->
+    <aop:config>
+    	<aop:pointcut expression="execution(* com.ccg.spring.springjdbc.service.*.*(..))" id="txPointCut"/>
+    	<!-- 将事务 txAdvice 与切点txPointCut 关联起来-->
+    	<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>
+    </aop:config>
+    
+    
+	<!-- 注入方式一：setter注入，必须要有无参构造器 -->
+	<bean id="beantifulGirl" class="com.ccg.spring.bean.Girl" scope="singleton">
+		<!-- property的name，对应bean的属性 -->
+		<property name="girlName" value="刘亦菲"></property>
+		<property name="hobies">
+			<list>
+				<value>吃饭</value>
+				<value>睡觉</value>
+				<value>喜欢我</value>
+			</list>
+		</property>
+		<property name="scores">
+			<map>
+				<entry><key><value>语文</value></key><value>60</value></entry>
+				<entry><key><value>数学</value></key><value>100</value></entry>
+				<entry><key><value>外语</value></key><value>90</value></entry>
+			</map>
+		</property>
+		<property name="props">
+			<props>
+				<prop key="key1">propValue1</prop>
+				<prop key="key2">propValue2</prop>
+				<prop key="key3">propValue3</prop>
+			</props>
+		</property>
+		<property name="set">
+			<set>
+				<value>setValue1</value>
+				<value>setValue2</value>
+				<value>setValue3</value>
+			</set>
+		</property>
+		<property name="array">
+			<array>
+				<value>arrayValue1</value>
+				<value>arrayValue2</value>
+				<value>arrayValue3</value>
+			</array>
+		</property>
+		<!-- 引用外部bean -->
+		<property name="boyFriend" ref="badBoy"></property>
+	</bean>
+	
+	<bean id="beautiful2" class="com.ccg.spring.bean.Girl">
+		<property name="girlName">
+			<value><![CDATA[刘亦菲2<^…^>]]></value>
+		</property>
+		<property name="hobies">
+		<!-- null的赋值的专属写法 -->
+			<null/>
+		</property>
+		<!-- 创建内部bean。内部bean不能被外部使用 -->
+		<property name="boyFriend">
+			<bean id="goodBoy1" class="com.ccg.spring.bean.Boy" p:boyName="刘洋1"></bean>
+		</property>
+		<!-- 属性是另外一个bean的集合,外部自定义的list集合作为引用,引入util命名空间 -->
+		<property name="boyFriends" ref="boyFriendList"></property>
+	</bean>
+	<util:list id="boyFriendList">
+		<ref bean="badBoy"/>
+		<ref bean="badBoy2"/>
+	</util:list>
+	
+	
+	<!-- 注入方式二：构造器注入。
+			参数跟构造器参数类型个数一致，index表示顺序 。
+			重载的构造器个数一致，可能创建的bean有歧义，需要有type指定参数类型来区分。
+			<![CDATA[...]]>可以包含特殊字符。-->
+	<bean id="uglyGirl" class="com.ccg.spring.bean.Girl">
+		<constructor-arg type="java.lang.String" index="0">
+			<value><![CDATA[凤姐<^…^>]]></value>
+		</constructor-arg>
+		<constructor-arg type="java.util.List" index="1" value="听,说,读,写"></constructor-arg>
+		<constructor-arg type="com.ccg.spring.bean.Boy" index="2" ref="badBoy"></constructor-arg>
+	</bean>
+	<bean id="uglyGirl3" class="com.ccg.spring.bean.Girl">
+		<constructor-arg type="java.lang.String" index="0">
+			<value>凤姐2</value>
+		</constructor-arg>
+		<constructor-arg type="java.util.List" index="1" value="听,说,读,写"></constructor-arg>
+		<constructor-arg type="com.ccg.spring.bean.Boy" index="2" ref="badBoy"></constructor-arg>
+	</bean>
+	
+	
+	<!-- 注入方式三：p命名空间实现注入，xmlns:p
+		p:boyFriend-ref，属性引用一个对象
+	 -->
+	<bean id="uglyGirl2" p:girlName="凤姐2" p:hobies="吃,喝,拉,撒" p:boyFriend-ref="badBoy3" class="com.ccg.spring.bean.Girl"></bean>
+	
+	<!-- SpEL语法，Spring的表达式语言：
+	引用另一个bean，可以用数据ref，也可以用value="#{...}" -->
+	<bean id="uglyGirl2_1" p:girlName="凤姐2" p:hobies="吃,喝,拉,撒" class="com.ccg.spring.bean.Girl">
+		<property name="boyFriend" value="#{badBoy3}"></property>
+		<!--等同于 <property name="boyFriend" ref="badBoy3"></property> -->
+	</bean>
+	
+	<!-- 装配方式四：byName根据名字自动装配。会去找跟setter方法的名字自动匹配的bean。此处找到boyFriend。
+	  				如果是byType,根据类型装配，IOC容器中必须只能有一个此类型的bean，有多个会抛出异常 -->
+	<bean id="uglyGirl4" p:girlName="凤姐3" p:hobies="吃,喝" class="com.ccg.spring.bean.Girl" autowire="byName"></bean>
+	<bean id="boyFriend" class="com.ccg.spring.bean.Boy" p:boyName="真正的boyFriend"></bean>	
+	
+	
+	<bean id="badBoy" class="com.ccg.spring.bean.Boy">
+		<property name="boyName" value="刘洋"></property>
+	</bean>	
+	<!-- depends-on,bean之间的依赖关系，badBoy2的对象生成必须要存在badBoy这个bean -->
+	<bean id="badBoy2" class="com.ccg.spring.bean.Boy" p:boyName="刘洋2" p:hobies="吃,喝,拉,撒" depends-on="badBoy"></bean>	
+	
+	<!-- 装配方式五：继承配置parent ，badBoy3继承父bean的hobies，覆盖父bean的boyName-->
+	<bean id="badBoy3" p:boyName="刘洋3" parent="badBoy2"></bean>	
+	
+	<!-- 抽象bean，其他的bean可以继承使用。不可以被IOC实例化。抽象bean可以没有class，有子bean实现。
+	没有class的bean必须是一个抽象bean -->
+	<bean id="badBoy4" p:hobies="吃,喝,拉,撒" abstract="true"></bean>	
+	
+	<!-- 装配方式六：静态工厂配置。用静态工厂配置bean实例
+			class：指向静态方法的全类名
+			factory-method：指向静态方法
+			constructor-arg：如果静态方法需要入参，则使用此配置参数 -->
+	<bean id="carFromStaticFactory" class="com.ccg.spring.bean.staticfactory.StaticBmwCarFactory" 
+		factory-method="getCar">
+		<constructor-arg value="mini1"></constructor-arg>
+	</bean>
+	<!-- 装配方式七：实例工厂配置。先创建工厂的实例carInstanceFactory，再创建bean:carFromInstanceFactory。
+			创建工厂的实例： class：指向实例方法的全类名
+			创建的bean： factory-bean：指向实例方法的bean
+						factory-method：指向实例方法
+						constructor-arg：如果实例方法需要入参，则使用此配置参数-->
+	<bean id="carInstanceFactory" class="com.ccg.spring.bean.instancefactory.InstanceCarFactory"></bean>
+	<bean id="carFromInstanceFactory" factory-bean="carInstanceFactory" factory-method="getCar">
+		<constructor-arg value="benchi"></constructor-arg>
+	</bean>
+	
+	<!-- 装配方式八：通过实现接口FactoryBean创建实例。
+			class:指向FactoryBean的全类名
+			property：属性
+			实际返回的bean是FactoryBean的getObject方法返回的实例，这里没有定义返回实例类型
+	-->
+	<bean id="carFromFactoryBean" class="com.ccg.spring.bean.factorybean.CarFactoryBean">
+		<property name="brand" value="mini-BMW"></property>
+	</bean>
+	
+	<!-- 装配方式九：扫描注解组件的方式创建bean -->
+	
+	<!-- 装配方式十：泛型依赖注入。利用父类的依赖关系，子类注入对应子类的bean -->
+	
+	
+</beans>

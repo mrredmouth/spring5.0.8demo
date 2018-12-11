@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 注意： 1、log4j2.xml可以放在任意的地方，只要你最后把它放到了classpath里。
+		   2、log4j2配置文件可以使用XML或JSON，似乎 不再支持properties文件了。
+		   3、默认的文件名也有所不同，log4j2.xml，不再是log4j.xml。  -->
+<!--  Configuration的status属性：这个用于设置log4j2自身内部的信息输出，可以不设置，
+									 当设置成trace时，你会看到log4j2内部各种详细输出。 --> 
+ <Configuration status="warn"> 
+	<Appenders> 
+		<Console name="Console" target="SYSTEM_OUT"> 
+			<PatternLayout pattern="%m%n" /> 
+		</Console> 
+	</Appenders> <Loggers> <Root level="INFO"> 
+	<AppenderRef ref="Console" /> 
+	</Root> 
+	</Loggers> 
+</Configuration>

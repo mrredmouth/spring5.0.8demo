@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+ 
+ 	<!-- ====================scope 作用域=========================== -->
+  	<!-- bean的作用域scope:
+			scope="singleton"：(默认)单例。容器初始化(ApplicationContext)时创建，生命周期里只有一个实例;
+			scope="prototype"：容器初始化时不创建，在每次请求(getBean)时创建一个新的bean;
+			scope="request":一次请求中;
+			scope="session":一次会话中; -->
+    <bean id="audiCar1" p:brand="audi" p:price="300000" class="com.ccg.spring.bean.Car" scope="singleton"></bean>
+    <bean id="audiCar2" p:brand="audi2" parent="audiCar1" scope="prototype"></bean>
+ 
+ 
+ 	<!-- ====================SpEL Spring表达式语言=========================== -->
+ 	<!-- 1、SpEL引用静态属性、静态方法：T(java.lang.Math).PI -->
+    <bean id="audiCar3" p:brand="audi3" p:price="300000" p:tyrePerimeter="#{T(java.lang.Math).PI * 80}" class="com.ccg.spring.bean.Car" scope="singleton"></bean>
+    <!-- 2、SpEL赋字面值（字符串、数值） -->
+    <bean id="audiCar4" p:brand="#{'audi4'}" p:price="400000" parent="audiCar3" scope="prototype"></bean>
+ 
+    <bean id="carBoy" class="com.ccg.spring.bean.Boy" p:boyName="sunnyCarBoy">
+    	<!-- 3、SpEL引用其他的bean -->
+    	<property name="car" value="#{audiCar4}"></property>
+    	<!-- 4、SpEL引用其他的bean的属性 -->
+    	<property name="wantCarName" value="#{audiCar3.brand}"></property>
+    	<!-- 5、SpEL使用运算符,动态赋值 -->
+    	<property name="carPriceLevel" value="#{audiCar4.price>300000 ? '金领' : '白领'}"></property>
+    </bean>
+ 
+	<!-- ====================cycle 生命周期=========================== -->
+	<!-- property的name为Setter的反射属性name2,虽然HelloWord的属性为name-->
+    <bean id="helloWord" class="com.ccg.spring.bean.HelloWord" 
+    	init-method="initHello" destroy-method="destroyHello" p:name2="my helloWord">
+    </bean>
+    <!-- BeanPostProcessor Bean的后置处理器，在init前后执行。放在此xml中对多有bean有效 -->
+ 	<bean class="com.ccg.spring.bean.beanpostprocessor.MyBeanPostProcessor"></bean>
+ 	
+</beans>
