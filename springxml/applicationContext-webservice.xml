@@ -8,8 +8,11 @@
         http://cxf.apache.org/jaxws
         http://cxf.apache.org/schemas/jaxws.xsd">
 	
+	
     <bean id="sendServiceBean" class="com.ccg.spring.webservice.czservice.provider.impl.SendServiceImpl"></bean>  
-    <!-- 注意下面的address，这里的address的名称就是访问的WebService的name -->   
+    <!-- 以apache-cxf-3.2.7 + spring 方式发布webservice服务接口。
+    	spring5.0.8demo -->
+    <!-- address="/sendService" ： 表示访问的WebService的name是sendService -->   
     <jaxws:server id="sendService" serviceClass="com.ccg.spring.webservice.czservice.provider.SendService" address="/sendService">      
 	    <jaxws:serviceBean>           
 	        <!-- 要暴露的 bean 的引用  -->         
