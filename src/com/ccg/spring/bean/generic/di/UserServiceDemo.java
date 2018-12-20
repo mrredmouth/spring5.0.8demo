@@ -2,6 +2,6 @@ package com.ccg.spring.bean.generic.di;
 
 import org.springframework.stereotype.Service;
 
-@Service
-public class UserService extends BaseService<User>{
+@Service("userServiceDemo")
+public class UserServiceDemo extends BaseService<User>{
 }

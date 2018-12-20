@@ -10,8 +10,9 @@ import com.ccg.spring.bean.annotation.repository.UserRepository;
 public class UserService {
 	
 	/*@Autowired 	//指定装配的属性是一个接口如果存在多个实现类，则会通过名称去匹配。如果匹配不到则报错
-	@Qualifier("userRepository")	//用Qualifier指定实现类的bean名去装配
-*/	private UserRepository userRepository;
+	  @Qualifier("userRepository")	//用Qualifier指定实现类的bean名去装配
+	*/	
+	private UserRepository userRepository;
 	
 	//==============Autowired,Qualifier分别放在属性上面，入参方法上面。均可====================
 

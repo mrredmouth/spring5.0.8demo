@@ -3,7 +3,7 @@ package com.ccg.spring.bean;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.ccg.spring.bean.generic.di.UserService;
+import com.ccg.spring.bean.generic.di.UserServiceDemo;
 
 public class TestBeanGenericDi {
 
@@ -19,7 +19,7 @@ public class TestBeanGenericDi {
 	public void testGenericDi(){
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext-genericdi.xml");
 		
-		UserService userService = (UserService) ctx.getBean("userService");
+		UserServiceDemo userService = (UserServiceDemo) ctx.getBean("userServiceDemo");
 		System.out.println(userService);
 		userService.add();
 	}

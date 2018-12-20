@@ -38,7 +38,9 @@
     </bean>
  
 	<!-- ====================cycle 生命周期=========================== -->
-	<!-- property的name为Setter的反射属性name2,虽然HelloWord的属性为name-->
+	<!-- property的name为Setter的反射属性name2,虽然HelloWord的属性为name。
+		 配置了init-method，则该bean在项目启动的时候会自动执行initHello方法。
+	-->
     <bean id="helloWord" class="com.ccg.spring.bean.HelloWord" 
     	init-method="initHello" destroy-method="destroyHello" p:name2="my helloWord">
     </bean>
